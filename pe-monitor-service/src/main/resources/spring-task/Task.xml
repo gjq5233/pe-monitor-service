@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+ 		http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/task
+     	http://www.springframework.org/schema/task/spring-task.xsd">
+
+
+	<!-- vc 告警历史数据 -->
+	<bean id="vcAlarmSaveTask"
+		class="com.kdgz.monitor.vsphere.task.VcAlarmSaveTask">
+		<property name="manager" ref="vsphereManager" />
+		<property name="size" value="100" />
+	</bean>
+
+	<!-- vc 事件历史数据 -->
+	<bean id="vcEventSaveTask"
+		class="com.kdgz.monitor.vsphere.task.VcEventSaveTask">
+		<property name="manager" ref="vsphereManager" />
+		<property name="size" value="200" />
+	</bean>
+
+	<!-- vc 性能历史数据 -->
+	<bean id="vcPerfSaveTask"
+		class="com.kdgz.monitor.vsphere.task.VcPerfSaveTask">
+		<property name="manager" ref="vsphereManager" />
+		<property name="kafkaManager" ref="kafkaManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<!-- vc 磁盘性能历史数据 -->
+	<bean id="vcPerfDiskSaveTask"
+		class="com.kdgz.monitor.vsphere.task.VcPerfDiskSaveTask">
+		<property name="kafkaManager" ref="kafkaManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<!-- vc 虚拟机运行时数据同步到kafka -->
+	<bean id="vcVmSaveTask"
+		class="com.kdgz.monitor.vsphere.task.VcVmSaveTask" />
+
+	<!-- ping sql历史数据 -->
+	<bean id="pingSaveTask"
+		class="com.kdgz.monitor.snmp.task.PingSaveTask">
+		<property name="manager" ref="dbSaveManager" />
+		<property name="kafkaManager" ref="kafkaManager" />
+		<property name="size" value="100" />
+	</bean>
+
+
+	<!-- sql 历史数据 -->
+	<bean id="metricSaveTask"
+		class="com.kdgz.monitor.task.MetricSaveTask">
+		<property name="manager" ref="dbSaveManager" />
+		<property name="kafkaManager" ref="kafkaManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<!-- 新metric格式，多tag多field -->
+	<bean id="metricDataSaveTask"
+		class="com.kdgz.monitor.task.MetricDataSaveTask">
+		<property name="kafkaManager" ref="kafkaManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<!-- zabbix指标数据保存 -->
+	<bean id="zabbixHisSaveTask"
+		class="com.kdgz.monitor.zabbix.task.ZabbixHisSaveTask">
+		<property name="kafkaManager" ref="kafkaManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<bean id="zabbixHisSaveDbTask"
+		class="com.kdgz.monitor.zabbix.task.ZabbixHisSaveDbTask">
+		<property name="zabbixManager" ref="zabbixManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<!-- zabbix指标数据保存 -->
+	<bean id="zabbixStrHisSaveTask"
+		class="com.kdgz.monitor.zabbix.task.ZabbixStrHisSaveTask">
+		<property name="zabbixManager" ref="zabbixManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<!-- zabbix告警数据保存 -->
+	<bean id="zabbixProblemSavaTask"
+		class="com.kdgz.monitor.zabbix.task.ZabbixProbSaveTask">
+		<property name="zabbixManager" ref="zabbixManager" />
+		<property name="size" value="10" />
+	</bean>
+
+	<!-- Syslog -->
+	<bean id="SyslogSaveTask"
+		class="com.kdgz.monitor.snmp.task.SyslogSaveTask">
+		<property name="manager" ref="dbSaveManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<!-- ipmiLog -->
+	<bean id="ipmiLogSaveTask"
+		class="com.kdgz.monitor.snmp.task.IpmiLogSaveTask">
+		<property name="manager" ref="dbSaveManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<!-- 接口 历史数据 -->
+	<bean id="ifSaveTask"
+		class="com.kdgz.monitor.snmp.task.IfSaveTask">
+		<property name="manager" ref="dbSaveManager" />
+		<property name="kafkaManager" ref="kafkaManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<!-- ifx接口 历史数据 -->
+	<bean id="ifxSaveTask"
+		class="com.kdgz.monitor.snmp.task.IfxSaveTask">
+		<property name="manager" ref="dbSaveManager" />
+		<property name="kafkaManager" ref="kafkaManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<!-- alarm历史数据存储 -->
+	<bean id="alarmSaveTask"
+		class="com.kdgz.monitor.task.AlarmSaveTask">
+		<property name="manager" ref="dbSaveManager" />
+		<property name="size" value="1000" />
+	</bean>
+
+	<bean id="confCacheTask"
+		class="com.kdgz.monitor.task.ConfCacheTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+		<property name="confDataManager" ref="confDataManager" />
+		<property name="vsphereManager" ref="vsphereManager" />
+		<property name="agentManager" ref="agentManager" />
+		<property name="peEnable" value="${pe.enable:false}" />
+		<property name="agentEnable" value="${agent.enable:false}" />
+	</bean>
+
+	<bean id="cmdWebConnTask"
+		class="com.kdgz.monitor.task.CmdWebConnTask">
+		<property name="client" ref="downCmdMuTcpClient" />
+	</bean>
+
+	<bean id="versionCacheTask"
+		class="com.kdgz.monitor.task.VersoinCacheTask">
+		<property name="confDataManager" ref="confDataManager" />
+	</bean>
+
+
+	<bean id="discoverSaveTask"
+		class="com.kdgz.monitor.snmp.task.DiscoverSaveTask">
+		<property name="manager" ref="dbSaveManager" />
+	</bean>
+
+	<!-- 动环实时请求告警数据 -->
+	<bean id="peCDataAlarmSaveTask"
+		class="com.kdgz.monitor.task.PeCDataAlarmSaveTask">
+		<property name="manager" ref="dbSaveManager" />
+		<property name="size" value="100" />
+	</bean>
+
+	<!-- 动环mon_pe_data_cur表插入 -->
+	<bean id="peDataSaveTask"
+		class="com.kdgz.monitor.snmp.task.PeDataSaveTask">
+		<property name="manager" ref="dbSaveManager" />
+		<property name="size" value="500" />
+	</bean>
+
+	<bean id="netBackUpJobSaveTask"
+		class="com.kdgz.monitor.nbu.task.NetBackUpJobSaveTask">
+		<property name="manager" ref="nbuManager" />
+		<property name="size" value="500" />
+	</bean>
+
+	<bean id="netBackUpWarmSaveTask"
+		class="com.kdgz.monitor.nbu.task.NetBackUpWarmTask">
+		<property name="manager" ref="nbuManager" />
+		<property name="size" value="500" />
+	</bean>
+
+	<bean id="netBackUpJobDeleteTask"
+		class="com.kdgz.monitor.nbu.task.NetBackUpDeleteTask">
+		<property name="manager" ref="nbuManager" />
+	</bean>
+
+	<bean id="peBAlarmSaveTask"
+		class="com.kdgz.monitor.pe.b.PeBAlarmSaveTask">
+		<property name="peBManager" ref="peBManager" />
+	</bean>
+	<bean id="peBConfCacheTask"
+		class="com.kdgz.monitor.pe.b.PeBConfCacheTask">
+		<property name="peBManager" ref="peBManager" />
+	</bean>
+	<bean id="peBDataSaveTask"
+		class="com.kdgz.monitor.pe.b.PeBDataSaveTask">
+		<property name="peBManager" ref="peBManager" />
+		<property name="size" value="5000"/>
+	</bean>
+	<bean id="peBDeviceUpdateTask"
+		class="com.kdgz.monitor.pe.b.PeBDeviceUpdateTask">
+		<property name="peBManager" ref="peBManager" />
+	</bean>
+	<bean id="peBLastDataUpdateTask"
+		class="com.kdgz.monitor.pe.b.PeBLastDataUpdateTask">
+		<property name="peBManager" ref="peBManager" />
+		<property name="size" value="5000"/>
+	</bean>
+	<bean id="peBThresholdUpdateTask"
+		class="com.kdgz.monitor.pe.b.PeBThresholdSaveTask">
+		<property name="peBManager" ref="peBManager" />
+	</bean>
+
+	<bean id="pe2MetricDataDbTask"
+		class="com.kdgz.monitor.pe2.task.Pe2MetricDataDbTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+
+	<bean id="pe2PtAcJsyaDoorRecordDbTask"
+		class="com.kdgz.monitor.pe2.task.Pe2PtAcJsyaDoorRecordDbTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+
+	<bean id="pe2AlarmDbTask"
+		class="com.kdgz.monitor.pe2.task.Pe2AlarmDbTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+
+	<bean id="pe2AlarmUpsVertivDbTask"
+		class="com.kdgz.monitor.pe2.task.Pe2AlarmUpsVertivDbTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+
+
+	<bean id="pe2HikAcsDeviceDbTask"
+		class="com.kdgz.monitor.pe2.hikvision.task.Pe2HikAcsDeviceDbTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+	<bean id="pe2HikAcsDeviceOnlineDbTask"
+		class="com.kdgz.monitor.pe2.hikvision.task.Pe2HikAcsDeviceOnlineDbTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+	<bean id="pe2HikCardReaderDbTask"
+		class="com.kdgz.monitor.pe2.hikvision.task.Pe2HikCardReaderDbTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+	<bean id="pe2HikCardReaderOnlineDbTask"
+		class="com.kdgz.monitor.pe2.hikvision.task.Pe2HikCardReaderOnlineDbTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+	<bean id="pe2HikDoorDbTask"
+		class="com.kdgz.monitor.pe2.hikvision.task.Pe2HikDoorDbTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+	<bean id="pe2HikDoorEventDbTask"
+		class="com.kdgz.monitor.pe2.hikvision.task.Pe2HikDoorEventDbTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+	<bean id="pe2HikDoorOnlineTask"
+		class="com.kdgz.monitor.pe2.hikvision.task.Pe2HikDoorOnlineTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+	<bean id="pe2HikDoorStateTask"
+		class="com.kdgz.monitor.pe2.hikvision.task.Pe2HikDoorStateTask">
+		<property name="pe2Manager" ref="pe2Manager" />
+	</bean>
+
+
+	<bean id="hcDataCacheTask"
+		class="com.kdgz.monitor.hc.datasyn.generic.task.HcConfCacheTask"
+		init-method="run">
+		<property name="hcConfSevice" ref="hcConfSevice" />
+	</bean>
+
+	<task:scheduled-tasks scheduler="commonScheduler">
+		<!-- <task:scheduled ref="tsdSaveTask" method="run" initial-delay="311" 
+			fixed-delay="200" /> -->
+
+		<task:scheduled ref="zabbixHisSaveTask" method="run"
+			initial-delay="113" fixed-delay="1000" />
+
+		<task:scheduled ref="zabbixHisSaveDbTask" method="run"
+			initial-delay="123" fixed-delay="1000" />
+
+		<task:scheduled ref="zabbixStrHisSaveTask" method="run"
+			initial-delay="133" fixed-delay="2000" />
+
+		<task:scheduled ref="zabbixProblemSavaTask"
+			method="run" initial-delay="145" fixed-delay="2000" />
+
+		<task:scheduled ref="metricSaveTask" method="run"
+			initial-delay="170" fixed-delay="1000" />
+
+		<task:scheduled ref="metricDataSaveTask" method="run"
+			initial-delay="193" fixed-delay="1000" />
+
+
+
+		<task:scheduled ref="alarmSaveTask" method="run"
+			initial-delay="510" fixed-delay="2000" />
+
+		<task:scheduled ref="ifSaveTask" method="run"
+			initial-delay="233" fixed-delay="1000" />
+
+		<task:scheduled ref="ifxSaveTask" method="run"
+			initial-delay="233" fixed-delay="1000" />
+
+		<task:scheduled ref="pingSaveTask" method="run"
+			initial-delay="437" fixed-delay="1000" />
+
+		<task:scheduled ref="vcAlarmSaveTask" method="run"
+			initial-delay="647" fixed-delay="2000" />
+
+		<task:scheduled ref="vcEventSaveTask" method="run"
+			initial-delay="711" fixed-delay="1000" />
+
+		<task:scheduled ref="vcPerfSaveTask" method="run"
+			initial-delay="803" fixed-delay="200" />
+
+		<task:scheduled ref="vcPerfDiskSaveTask" method="run"
+			initial-delay="903" fixed-delay="1000" />
+
+		<task:scheduled ref="SyslogSaveTask" method="run"
+			initial-delay="903" fixed-delay="1000" />
+
+		<task:scheduled ref="ipmiLogSaveTask" method="run"
+			initial-delay="1111" fixed-delay="5000" />
+
+		<task:scheduled ref="discoverSaveTask" method="run"
+			initial-delay="903" fixed-delay="1000" />
+
+		<task:scheduled ref="peCDataAlarmSaveTask" method="run"
+			initial-delay="903" fixed-delay="1000" />
+
+		<!-- <task:scheduled ref="vcPerfSaveTask" method="run" initial-delay="977" 
+			fixed-delay="200" /> -->
+		<!-- <task:scheduled ref="flushDataTask" method="run" initial-delay="4000" 
+			fixed-delay="60000" /> -->
+
+		<task:scheduled ref="confCacheTask" method="run"
+			initial-delay="15000" fixed-delay="30000" />
+
+		<task:scheduled ref="versionCacheTask" method="run"
+			initial-delay="1357" fixed-delay="10000" />
+
+
+		<task:scheduled ref="cmdWebConnTask" method="run"
+			initial-delay="2937" fixed-delay="90000" />
+
+		<task:scheduled ref="peDataSaveTask" method="run"
+			initial-delay="3233" fixed-delay="500" />
+
+		<!-- nbu job数据保存 -->
+		<task:scheduled ref="netBackUpJobSaveTask" method="run"
+			initial-delay="30000" fixed-delay="1000" />
+
+		<!-- nbu 告警数据保存 -->
+		<task:scheduled ref="netBackUpWarmSaveTask"
+			method="run" initial-delay="30000" fixed-delay="1000" />
+
+		<!-- nbu 脏数据清除 -->
+		<task:scheduled ref="netBackUpJobDeleteTask"
+			method="run" initial-delay="32000" fixed-delay="120000" />
+
+		<task:scheduled ref="hcDataCacheTask" method="run"
+			initial-delay="18000" fixed-delay="30000" />
+
+		<task:scheduled ref="peBAlarmSaveTask" method="run"
+			initial-delay="30000" fixed-delay="30000" />
+		<task:scheduled ref="peBConfCacheTask" method="run"
+			initial-delay="30000" fixed-delay="30000" />
+		<task:scheduled ref="peBDataSaveTask" method="run"
+			initial-delay="30000" fixed-delay="${pe2b.data.cycle:1000}" />
+		<task:scheduled ref="peBDeviceUpdateTask" method="run"
+			initial-delay="30000" fixed-delay="30000" />
+		<task:scheduled ref="peBLastDataUpdateTask"
+			method="run" initial-delay="30000"
+			fixed-delay="${pe2b.data.cycle:1000}" />
+		<task:scheduled ref="peBThresholdUpdateTask"
+			method="run" initial-delay="30000" fixed-delay="2000" />
+
+		<task:scheduled ref="pe2MetricDataDbTask" method="run"
+			initial-delay="9111" fixed-delay="${pe2.data.cycle:1000}" />
+
+		<task:scheduled ref="pe2AlarmDbTask" method="run"
+			initial-delay="9777" fixed-delay="1000" />
+
+		<task:scheduled ref="pe2PtAcJsyaDoorRecordDbTask"
+			method="run" initial-delay="10123" fixed-delay="1000" />
+
+
+		<task:scheduled ref="pe2AlarmUpsVertivDbTask"
+			method="run" initial-delay="9777" fixed-delay="1000" />
+
+		<task:scheduled ref="pe2HikAcsDeviceDbTask"
+			method="run" initial-delay="9000" fixed-delay="60000" />
+		<task:scheduled ref="pe2HikAcsDeviceOnlineDbTask"
+			method="run" initial-delay="9000" fixed-delay="60000" />
+		<task:scheduled ref="pe2HikCardReaderDbTask"
+			method="run" initial-delay="9000" fixed-delay="60000" />
+		<task:scheduled ref="pe2HikCardReaderOnlineDbTask"
+			method="run" initial-delay="9000" fixed-delay="60000" />
+		<task:scheduled ref="pe2HikDoorDbTask" method="run"
+			initial-delay="9000" fixed-delay="60000" />
+		<task:scheduled ref="pe2HikDoorEventDbTask"
+			method="run" initial-delay="9000" fixed-delay="60000" />
+		<task:scheduled ref="pe2HikDoorOnlineTask" method="run"
+			initial-delay="9000" fixed-delay="60000" />
+		<task:scheduled ref="pe2HikDoorStateTask" method="run"
+			initial-delay="9000" fixed-delay="60000" />
+
+
+
+	</task:scheduled-tasks>
+
+</beans>

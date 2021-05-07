@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	<!-- 消息分发处理 -->
+	<bean id="hcServerDataDispatcher"
+		class="com.kdgz.monitor.comm.hc.HcDataServerDispatcher">
+		
+		<property name="hcConfSevice" ref="hcConfSevice" />
+	</bean>
+
+
+	<!-- 消息接口Handler， 需实现@Sharable，否则不用spring单例 -->
+	<bean id="hcServerDataServerHandler"
+		class="com.kdgz.monitor.comm.hc.HcDataTcpServerHandler">
+		<property name="dispatcher" ref="hcServerDataDispatcher" />
+	</bean>
+
+	<!-- 处理链 -->
+	<bean id="hcServerDataInitializer"
+		class="com.kdgz.monitor.comm.MonitorInitializer">
+		<property name="userHandler" ref="hcServerDataServerHandler" />
+		<property name="readIdleTimeSeconds" value="60" />
+		<property name="writerIdleTimeSeconds" value="0" />
+		<property name="ssl" value="false" /><!-- 开启ssl -->
+		<property name="server" value="true" /><!-- 是否是服务端 -->
+	</bean>
+
+	<bean id="hcServerDataTcpServer" class="base.comm.TcpServer"
+		init-method="start">
+		<constructor-arg index="0" value="${hc.cmd.server.bind.ip:0.0.0.0}" /><!-- 
+			监听的本地ip -->
+		<constructor-arg index="1" value="${hc.cmd.server.bind.port:7777}" /><!-- 
+			监听的本地port -->
+		<constructor-arg index="2" value="0" /><!-- 工作线程数，小于1为cpu数乘以2 -->
+		<constructor-arg index="3" ref="hcServerDataInitializer" /><!-- 
+			处理链 -->
+		<property name="recBuf" value="65536" /><!-- socket接收缓冲大小 -->
+		<property name="sendBuf" value="65536" /><!-- socket发送缓冲大小 -->
+		<property name="name" value="hcServer data sync server" />
+	</bean>
+</beans>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 定义producer的参数 -->
+	<bean id="localConsistencyProducerConfigs"
+		class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="bootstrap.servers" value="${bootstrap.servers}" />
+				<entry key="client.id" value="" />
+				<entry key="retries" value="${consistency.retries:2}" />
+				<entry key="batch.size" value="${consistency.batch.size:1}" />
+				<entry key="linger.ms" value="${linger.ms:200}" />
+				<entry key="request.timeout.ms"
+					value="${request.timeout.ms:6000}" />
+				<entry key="delivery.timeout.ms"
+					value="${delivery.timeout.ms:20000}" />
+				<entry key="compression.type" value="${compression.type:none}" />
+				<entry key="receive.buffer.bytes" value="65536" />
+				<entry key="send.buffer.bytes" value="65536" />
+				<entry key="acks" value="${consistency.acks:all}" />
+				<entry key="key.serializer"
+					value="org.apache.kafka.common.serialization.IntegerSerializer" />
+				<entry key="value.serializer"
+					value="com.kdgz.monitor.hc.datasyn.kafka.serializer.HcProstuffCodec" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="localInconsistencyProducerConfigs"
+		class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="bootstrap.servers" value="${bootstrap.servers}" />
+				<entry key="client.id" value="" />
+				<entry key="retries" value="${inconsistency.retries:0}" />
+				<entry key="batch.size" value="${inconsistency.batch.size:1000}" />
+				<entry key="linger.ms" value="${linger.ms:500}" />
+				<entry key="request.timeout.ms"
+					value="${request.timeout.ms:6000}" />
+				<entry key="delivery.timeout.ms"
+					value="${delivery.timeout.ms:20000}" />
+				<entry key="compression.type" value="${compression.type:none}" />
+				<entry key="receive.buffer.bytes" value="65536" />
+				<entry key="send.buffer.bytes" value="524288" />
+				<entry key="acks" value="${inconsistency.acks:0}" />
+				<entry key="key.serializer"
+					value="org.apache.kafka.common.serialization.IntegerSerializer" />
+				<entry key="value.serializer"
+					value="com.kdgz.monitor.hc.datasyn.kafka.serializer.HcProstuffCodec" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="localHcKafkaProducer"
+		class="com.kdgz.monitor.hc.datasyn.kafka.HcKafkaProducer">
+		<constructor-arg ref="localConsistencyProducerConfigs" />
+		<constructor-arg ref="localInconsistencyProducerConfigs" />
+	</bean>
+
+</beans>

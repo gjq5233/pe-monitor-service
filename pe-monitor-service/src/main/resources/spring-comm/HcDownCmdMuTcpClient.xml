@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="hcDownCmdClientDispatcher" class="com.kdgz.monitor.comm.hc.HcDownCmdClientDispatcher" />
+	
+	
+	<!-- 消息接口Handler， 需实现@Sharable，否则不用spring单例 -->
+	<bean id="hcDownCmdServerHandler" class="com.kdgz.monitor.comm.hc.HcDownCmdTcpClientHandler">
+		<property name="dispatcher" ref="hcDownCmdClientDispatcher" />
+		<property name="monitorSeqNum" value="${monitor.seqNum}" />
+	</bean>
+
+	<!-- 处理链 -->
+	<bean id="hcDownCmdInitializer" class="com.kdgz.monitor.comm.MonitorInitializer">
+		<property name="userHandler" ref="hcDownCmdServerHandler" />
+		<property name="readIdleTimeSeconds" value="60" />
+		<property name="writerIdleTimeSeconds" value="10" />
+		<property name="ssl" value="false" />
+		<property name="server" value="false" />
+	</bean>
+
+	<bean id="hcDownCmdMuTcpClient" class="base.comm.MultiAddrNettyTcpClient">
+		<property name="handler" ref="hcDownCmdInitializer" />
+	</bean>
+
+</beans>

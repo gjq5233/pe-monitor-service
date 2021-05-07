@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+	
+
+	<!-- 消息接口Handler， 需实现@Sharable，否则不用spring单例 -->
+	<bean id="dcuServerHandler"
+		class="cn.edu.hfut.pe.dcu.comm.DcuDataTcpServerHandler">
+	</bean>
+
+	<!-- 处理链 -->
+	<bean id="dcuInitializer"
+		class="cn.edu.hfut.pe.dcu.comm.DcuServerInitializer">
+		<property name="userHandler" ref="dcuServerHandler" />
+		<property name="readIdleTimeSeconds" value="${session.timeout.seconds:300}" />
+		<property name="writerIdleTimeSeconds" value="0" />
+	</bean>
+
+	<bean id="dcuTcpServer" class="base.comm.TcpServer"
+		init-method="start">
+		<constructor-arg index="0" value="${server.bind.ip:0.0.0.0}" /><!-- 
+			监听的本地ip -->
+		<constructor-arg index="1" value="${server.bind.port:31245}" /><!-- 
+			监听的本地port -->
+		<constructor-arg index="2" value="0" /><!-- 工作线程数，小于1为cpu数乘以2 -->
+		<constructor-arg index="3" ref="dcuInitializer" /><!-- 
+			处理链 -->
+		<property name="recBuf" value="2048" /><!-- socket接收缓冲大小 -->
+		<property name="sendBuf" value="512" /><!-- socket发送缓冲大小 -->
+		<property name="name" value="proxy data sync server" />
+	</bean>
+</beans>

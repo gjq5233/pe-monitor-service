@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 配置数据初始化 -->
+	<bean id="staticDataCache"
+		class="com.kdgz.monitor.task.ConfCacheTask" init-method="run">
+		<property name="pe2Manager" ref="pe2Manager" />
+		<property name="confDataManager" ref="confDataManager" />
+		<property name="vsphereManager" ref="vsphereManager" />
+		<property name="agentManager" ref="agentManager" />
+		<property name="peEnable" value="${pe.enable:false}" />
+		<property name="agentEnable" value="${agent.enable:false}" />
+		<property name="peUpsEnable" value="${pe.ups.enable:false}"/>
+	</bean>
+
+	<bean id="versionDataCache"
+		class="com.kdgz.monitor.task.VersoinCacheTask" init-method="run">
+		<property name="confDataManager" ref="confDataManager" />
+	</bean>
+
+</beans>
+

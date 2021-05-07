@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="confDataManager"
+		class="com.kdgz.monitor.service.impl.ConfDataManagerImpl">
+		<property name="confDataDao" ref="confDataDao" />
+		<property name="snmpConfDao" ref="snmpDao"/>
+		<property name="dataSource" ref="confDataSource" />
+		<property name="zabbixDao" ref="zabbixDao" />
+		<property name="telnetPing" value="${telnetPing:true}" />
+	</bean>
+
+
+	<bean id="dbSaveManager"
+		class="com.kdgz.monitor.service.impl.DbSaveManagerImpl">
+		<property name="dao" ref="saveDataDao" />
+		<property name="snmpDataDao" ref="snmpDao" />
+		<property name="dataSource" ref="confDataSource" />
+ 	</bean>
+
+
+	<bean id="protocolManager"
+		class="com.kdgz.monitor.service.impl.ProtocolManagerImpl" />
+
+	<bean id="snmpManager"
+		class="com.kdgz.monitor.service.impl.SnmpManagerImpl">
+		<property name="dbSaveManager" ref="dbSaveManager" />
+		<property name="kafkaManager" ref="kafkaManager" />
+	</bean>
+
+	<bean id="zabbixManager" class="com.kdgz.monitor.service.impl.ZabbixManagerImpl">
+		<property name="runtimeExecutor" ref="taskExecutor" />
+		<property name="zabbixDao" ref="zabbixDao"/>
+		<property name="dbSaveDao" ref="saveDataDao" />
+		<property name="dataSource" ref="confDataSource"/>
+ 	</bean>
+
+	<bean id="kafkaManager"
+		class="com.kdgz.monitor.service.impl.KafkaProducerManagerImpl">
+		<property name="KafkaTemplate" ref="KafkaTemplate" />
+		<property name="topicIf" value="${topic.mon_if:mon_if}" />
+	</bean>
+	
+	<bean id="versionManager"
+		class="com.kdgz.monitor.service.impl.VersionManagerImpl">
+		<property name="dao" ref="versionDao" />
+		<property name="dataSource" ref="confDataSource" />
+	</bean>
+
+	<bean id="nbuManager" class="com.kdgz.monitor.service.impl.NetBackUpManagerImpl">
+		<property name="runtimeExecutor" ref="taskExecutor"/>
+		<property name="dataSource" ref="confDataSource" />
+		<property name="netBackUpdao" ref="nbuDao" />
+	</bean>
+
+	<bean id="vsphereManager" class="com.kdgz.monitor.service.impl.VsphereManagerImpl">
+		<property name="runtimeExecutor" ref="taskExecutor"/>
+		<property name="dataSource" ref="confDataSource" />
+		<property name="dao" ref="vcDao" />
+	</bean>
+	
+	<bean id="agentManager" class="com.kdgz.monitor.service.impl.AgentManagerImpl">
+		<property name="runtimeExecutor" ref="taskExecutor"/>
+		<property name="dataSource" ref="confDataSource" />
+		<property name="dao" ref="agentDao" />
+	</bean>
+
+	<bean id="peBManager" class="com.kdgz.monitor.service.impl.PeBManagerImpl">
+		<property name="dataSource" ref="confDataSource" />
+		<property name="dao" ref="peBDao"/>
+	</bean>
+	
+	<bean id="pe2Manager" class="com.kdgz.monitor.service.impl.Pe2ManagerImpl">
+		<property name="dataSource" ref="confDataSource" />
+		<property name="pe2Dao" ref="pe2Dao"/>
+	</bean>
+
+</beans>

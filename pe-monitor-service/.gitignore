@@ -1,0 +1,15 @@
+﻿*.class
+*.zip
+*.jar
+*.log
+*.bak
+dependency-reduced-pom.xml
+target
+*.project
+*.settings
+*.classpath
+*.idea
+*.DS_Store
+*.iml
+/log/
+/bin/
